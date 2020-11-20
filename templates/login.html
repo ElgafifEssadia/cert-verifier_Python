@@ -1,0 +1,82 @@
+{% extends 'layout4.html' %}
+{% block body %}
+
+    
+
+    <div class="wrap-contact100">
+
+
+ <form class="form-signin" role="form" method="post" enctype=multipart/form-data>
+
+              <span class="contact100-form-title">
+          DocCerts
+              <small>Sign in to start your session</small>
+           </span>
+              <p style="color:red;font-weight:bold">
+ {% if error %}
+  {{ error }}
+ {% endif %}
+</p>
+
+           </br>
+</br>
+
+      <div class="form-group has-feedback">
+        <input type="email" name="email" id="email" class="form-control" placeholder="Email">
+        <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+      </div>
+      <div class="form-group has-feedback">
+        <input type="password" name="password" id="password" class="form-control" placeholder="Password">
+        <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+      </div>
+
+                </br>
+
+           </br>
+</br>
+
+               <div class="form-group">
+                            <div class="aab controls col-md-4 "></div>
+                            <div class="controls col-md-8 ">
+                                <input type="submit" name="Signup" value="Sign In" class="btn btn-primary btn btn-info" id="submit-id-signup"  />
+
+                            </div>
+                        </div>
+
+
+
+    </form>
+
+           </br>
+</br>
+              
+    <!-- /.social-auth-links -->
+
+    
+    <a href="/registration" class="text-center">Register a new membership</a>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-23581568-13');
+</script>
+<script src="{{url_for('static', filename = 'bower_components/jquery/dist/jquery.min.js')}}" ></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="{{url_for('static', filename = 'bower_components/bootstrap/dist/js/bootstrap.min.js')}}" ></script>
+<!-- iCheck -->
+<script src="{{url_for('static', filename = 'plugins/iCheck/icheck.min.js')}}" ></script>
+<script>
+  $(function () {
+    $('input').iCheck({
+      checkboxClass: 'icheckbox_square-blue',
+      radioClass: 'iradio_square-blue',
+      increaseArea: '20%' /* optional */
+    });
+  });
+</script>
+  
+    
+{% endblock %}

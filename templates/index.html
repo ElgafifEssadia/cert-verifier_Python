@@ -1,0 +1,237 @@
+{% extends 'layout2.html' %}
+{% block body %}
+      <script>
+	function myFunction() {
+ 		 var x = document.getElementById("certificatefile").files[0].name;;
+ 	 	 document.getElementById("demo").innerHTML = x;
+		}
+</script>
+        
+ <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Verifying certificate
+
+      </h1>
+     <ol class="breadcrumb">
+        <li><a href="/home"><i class="glyphicon glyphicon-home"></i> Home</a></li>
+
+        <li><a href="#"></a></li>
+
+
+      </ol>
+    </section>
+
+          <p style="color:red;font-weight:bold">
+                                          {% if error1 %}
+                                            <div class="isa_error">
+                                               <i class="fa fa-times-circle"></i>
+                                                           {{ error1 }}
+                                             </div>
+                                           {% endif %}
+                                  </p>
+    
+ 	  <section class="content">
+               <div class="row">
+                 <div class="col-xs-12">
+
+                  <div class="box">
+                       <div class="box-header">
+                           <h3 class="box-title">Verifying certificate</h3>
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+ 
+	                   <!-- <div class="col-md-8 col-md-offset-2" style="margin-left:20%">-->
+                            {% if error==None %}
+                               <form class="form-signin form-inlin justify-content-center" id="verify" role="form" method="post" enctype=multipart/form-data>
+                                  <center> <h3 class="form-signin-heading">Please tape the certificate ID, The student ID or the student National ID </h3></center>
+                                      <a href="#" id="flipToRecover" class="flipLink">
+                                         <div id="triangle-topright"></div>
+                                       </a>
+           
+                               <input type="text" class="form-control" name="certificate" id="certificate" placeholder="Certificate ID, Student ID or Student National ID" >
+                               <br />
+
+                                <button class="btn btn-lg btn-success " type="submit"> Search </button>	  
+	     
+		                <br />
+		                <br />
+            
+                                </form>
+                                 {% endif %}
+
+                                 <br />
+       
+                        
+                                       {% if error %}
+                                 	<h3> Verifying certificate for :</h3>
+                                        {% if data %}
+                                          <table id="example1" class="table table-bordered table-striped">
+                                            {% for d in data %}
+                                           <thead>
+                                    
+                                             <tr>
+                                                <th>Student Full name</th>
+                                                <td> {{d.recipientProfile.name}} {{ d.Lname }}</td>
+                                             </tr>
+                                           </thead>
+
+                                         <tbody>
+                                            <tr>
+                                                  <td> Institution</td>
+                                                  <td> {{d.badge.issuer.name.replace("_"," ")}} </td>
+                                                 
+                                                 
+                                                 
+
+                                            </tr>
+                                           <tr>
+                                                  <td> Degree </td>
+                                                  <td>{{d.degree}}</td>
+
+                                          </tr>
+                                          <tr>       
+                                                  <td> Major </td>
+                                                  <td> {{d.Major.replace("_"," ")}}</td>
+                                           </tr>
+                                           <tr>
+                                                  <td> Certificate ID</td>
+                                                  <td> {{d.certificateid.replace("_"," ")}} </td>
+
+                                           </tr>      
+                                           <tr> 
+                                                  <td> Date of Graduation </td>
+                                                  <td> {{d.DateOfGraduation}}</td>
+                                           </tr>
+
+
+                                         </tbody>
+                                        {% endfor %}
+                                        </table>
+                                        {% endif %}
+
+                                        {% if obj %}
+                                             
+                                          <table id="example1" class="table table-bordered table-striped">
+                                                 <thead>
+
+                                             <tr>
+                                                <th>Student Full name</th>
+                                                <td> {% if obj['recipientProfile']['name'] and obj['Lname'] %}{{obj['recipientProfile']['name']}} {{ obj['Lname'] }} {% endif %}</td>
+                                             </tr>
+                                           </thead>
+                                             <tbody>
+                                            <tr>
+                                                  <td> Institution</td>
+                                                  <td> {% if obj['badge']['issuer']['name']  %} {{obj['badge']['issuer']['name'].replace("_"," ")}}  {% endif %} </td>
+
+
+
+
+                                            </tr>
+                                           <tr>
+                                                  <td> Degree </td>
+                                                  <td>{% if obj['degree'] %} {{obj['degree']}}  {% endif %}</td>
+
+                                          </tr>
+                                          <tr>
+                                                  <td> Major </td>
+                                                  <td> {% if obj['Major'] %} {{obj['Major'].replace("_"," ")}}  {% endif %}</td>
+                                           </tr>
+                                           <tr>
+                                                  <td> Certificate ID</td>
+                                                  <td> {% if obj['certificateid'] %} {{obj['certificateid'].replace("_"," ")}}  {% endif %}</td>
+
+                                           </tr>
+                                           <tr>
+                                                  <td> Date of Graduation </td>
+                                                  <td>{% if obj['DateOfGraduation'] %} {{obj['DateOfGraduation']}}  {% endif %}</td>
+                                           </tr>
+
+
+                                         </tbody>
+                                          </table>
+                                       {% endif %}
+
+ 
+                           {% endif %}
+                                 <br />
+        
+                                 <br />
+
+         
+      
+                                  {% for line in text %}
+                                    <p style="font-weight:bold"> {{line}}</p>        
+                                  {% endfor %}
+
+
+     </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  {% include 'includes/footer.html' %}
+
+  <!-- Control Sidebar -->
+
+  <!-- /.control-sidebar -->
+  <!-- Add the sidebar's background. This div must be placed
+       immediately after the control sidebar -->
+ 
+<!-- ./wrapper -->
+<script>
+$('.btn').on('click', function() {
+    var $this = $(this);
+  $this.button('loading');
+    setTimeout(function() {
+       $this.button('reset');
+   }, 8000);
+});
+</script>
+
+<script   src="{{url_for('static', filename = 'bower_components/jquery/dist/jquery.min.js')}}" ></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="{{url_for('static', filename = 'bower_components/bootstrap/dist/js/bootstrap.min.js')}}"  ></script>
+<!-- FastClick -->
+<script src="{{url_for('static', filename = 'bower_components/fastclick/lib/fastclick.js')}}" ></script>
+<!-- AdminLTE App -->
+<script  src="{{url_for('static', filename = 'dist/js/adminlte.min.js')}}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{{url_for('static', filename = 'dist/js/demo.js')}}"  ></script>
+
+<!-- DataTables -->
+<script src="{{url_for('static', filename = 'bower_components/datatables.net/js/jquery.dataTables.min.js')}}" ></script>
+<script src="{{url_for('static', filename = 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js')}}" ></script>
+<!-- SlimScroll -->
+<script src="{{url_for('static', filename = 'bower_components/jquery-slimscroll/jquery.slimscroll.min.js')}}"></script>
+
+<script>
+  $(function () {
+    $('#example1').DataTable()
+    $('#example2').DataTable({
+      'paging'      : true,
+      'lengthChange': false,
+      'searching'   : false,
+      'ordering'    : true,
+      'info'        : true,
+      'autoWidth'   : false
+    })
+  })
+</script>
+</body>
+</html>
+      
+
+
+
+{% endblock %}

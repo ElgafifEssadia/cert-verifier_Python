@@ -1,0 +1,102 @@
+{% extends 'layout.html' %}
+{% block body %}
+  <div class="row">
+    <script>
+	function myFunction() {
+ 		 var x = document.getElementById("certificatefile").files[0].name;;
+ 	 	 document.getElementById("demo").innerHTML = x;
+		}
+</script>
+   
+   <center>     <h1>Verifying certificate</h1> </center>
+	<br />
+	     <form class="form-signin form-inlin justify-content-center" id="verify" role="form" method="post" enctype=multipart/form-data>
+	   <center> <h3 class="form-signin-heading"> Upload a json file</h3>  </center>
+	<center>	<div class="custom-file" onchange="myFunction()">
+		    <input type="file" class="custom-file-input" name="certificatefile" id="certificatefile" placeholder="Certificate ID" multiple='' >
+		    <label class="custom-file-label" for="inputGroupFile03"  ><p id="demo">Choose a json a file</p></label>
+		  </div></center>
+	     
+		<br />
+		<br />
+               <center><button class="btn btn-lg btn-success " type="submit">Verify</button></center>
+          </form>
+        <br />
+        
+	{% if error %}
+          <p style="border-bottom:2px solid"></p>
+	<p> Verifying certificate ...</p>
+         <p> {{error}}</p>
+	{% endif %}
+        <br />
+        
+        <br />
+
+        {% if data %}
+        <div>
+  <table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">Student ID</th>
+      <th scope="col">{% if data.ID %}{{data.ID}} {% endif %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Student First Name</th>
+      <td>{{data.recipientProfile.name}}</td>
+
+    </tr>
+    <tr>
+      <th scope="row">Student Last Name</th>
+      <td>{{data.Lname}}</td>
+
+    </tr>
+   
+
+    <tr>
+      <th scope="row">Date of Graduation</th>
+      <td>{{data.DateOfGraduation}}</td>
+              
+    </tr>
+   <tr>
+      <th scope="row">Organization</th>
+      <td>{{data.badge.issuer.name}}</td>
+
+    </tr>
+    <tr>
+      <th scope="row">Degree</th>
+      <td>{{data.degree}}</td>
+
+    </tr>
+      <tr>
+      <th scope="row">Major</th>
+      <td>{{data.Major}}</td>
+
+    </tr>
+
+  </tbody>
+</table>
+        </div>
+        {% endif %}
+         {% for line in text %}
+            <p> {{line}}</p>        
+          {% endfor %}
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+    </div>
+
+
+ </div>
+
+
+{% endblock %}

@@ -1,0 +1,5 @@
+Checking certificate has not been tampered with,passed
+Checking certificate has not expired,passed
+Checking not revoked by issuer,passed
+Checking authenticity,passed
+Validation,passed

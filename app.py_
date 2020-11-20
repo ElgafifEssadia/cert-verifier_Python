@@ -1,0 +1,160 @@
+#!/usr/bin/python3
+import json
+import os
+import subprocess
+import mysql.connector 
+import sqlite3
+from flask import Flask, jsonify, request, abort, render_template, url_for, session, request, redirect
+from flask_debugtoolbar import DebugToolbarExtension
+from subprocess import call
+from os import listdir
+from os.path import isfile, join
+import cert_issuer.config
+from cert_issuer.blockchain_handlers import bitcoin
+import cert_issuer.issue_certificates
+from werkzeug.utils import secure_filename
+from pymongo import MongoClient
+# IMPORT ETHEREUM FOR GETTING THE BALANCE
+# from Cert_Issuer.cert_issuer.blockchain_handlers.ethereum import connectors  
+
+app = Flask(__name__)
+config = None
+UPLOAD_FOLDER = 'data'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+# the toolbar is only enabled in debug mode:
+app.debug = True
+
+# set a 'SECRET_KEY' to enable the Flask session cookies
+app.config['SECRET_KEY'] = '<replace with a secret key>'
+
+#toolbar = DebugToolbarExtension(app)
+
+
+def get_config():
+    global config
+    if config == None:
+        config = cert_issuer.config.get_config()
+    return config
+
+
+
+@app.route('/cert_issuer/api/v1.0/issue', methods=['POST'])
+def issue():
+    config = get_config()
+    certificate_batch_handler, transaction_handler, connector = \
+            bitcoin.instantiate_blockchain_handlers(config, False)
+    certificate_batch_handler.set_certificates_in_batch(request.json)
+    cert_issuer.issue_certificates.issue(config, certificate_batch_handler, transaction_handler)
+    return json.dumps(certificate_batch_handler.proof)
+
+
+
+@app.route("/")
+def index():
+   
+        return render_template('login.html')
+@app.route("/", methods=['POST'])
+def Login():
+ error=""
+ if request.form['password'] and request.form['email']:
+  #----------------------------------- Checking if the user exists in DB ------$
+      import mysql.connector
+      from mysql.connector import Error
+      try:
+         mySQLconnection = mysql.connector.connect(host='doccert.cpt7ef0q6mfq.us-east-1.rds.amazonaws.com',
+         port=3306,
+         database='oumaima',
+         user='oumaima',
+         password='oumaima1996')
+         sql_select_Query = "select * from personne,tiers_partie where email= %s and password =%s and personne.id = tiers_partie.id"
+         cursor = mySQLconnection .cursor()
+         cursor.execute(sql_select_Query,(request.form['email'],request.form['password']))
+         row = cursor.fetchone()
+         return redirect(url_for('index'))
+
+      except Error as e :
+
+           print ("Error while connecting to MySQL", e)
+      finally:
+                                     #closing database connection.
+          if(mySQLconnection .is_connected()):
+                                           mySQLconnection.close()
+                                           print("MySQL connection is closed")
+          return redirect(url_for('verifying'))
+
+ else:
+         return redirect(url_for('index'))
+  
+@app.route("/index",methods=['POST'])
+def verifying():
+  if request.form['certificate']: 
+    client = MongoClient('mongodb://salma:salma@35.153.100.231:27017/test')
+    #call("sudo rm  /home/ubuntu/Desktop/Cert/Cert-Viewer/cert-viewer/cert_data/*.json",shell=True)
+    db = client['doccerts']
+    certificates=db.testcerts
+    cc=certificates.find({
+       'certificateid': request.form['certificate'],
+
+        }, {
+
+                '_id': 0
+        }
+     )
+    data=''
+    d=[]
+    for c in cc:
+        data=c
+        pat="data/"+request.form['certificate']+".json"
+
+        with open(pat, 'w') as file:
+            json.dump(data,file)
+
+        break
+   
+
+  error=""
+  if request.method == 'POST':
+       try:
+
+          if len(request.files) != 0:
+            file = request.files['certificatefile']
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename)) 
+            call("python cert_verifier/verifier.py data/" + filename,shell=True)
+            text = open('verifying_debug.txt', 'r+')
+            content = text.readlines()
+            text.close()
+            call("rm data/*.json",shell=True)
+            return render_template('index.html',error=filename,text=content)
+
+          elif request.form['certificate'] and os.path.isdir("data/") and os.path.isfile(os.path.join("data/", request.form['certificate']+".json")):
+             certificateFile=request.form['certificate']+".json"
+             call("python cert_verifier/verifier.py  data/" + certificateFile,shell=True)
+             text = open('verifying_debug.txt', 'r+')
+             content = text.readlines()
+             text.close()
+             #import csv
+             #with open('/home/ubuntu/Desktop/Cert/Cert-Tools/cert-tools/sample_data/rosters/roster_testnet.csv', 'r') as inFile:
+              #        reader = csv.reader(inFile, delimiter=',', quoting=csv.QUOTE_NONE)
+               #       data=[]
+                #      for line in reader:
+                 #        if line[1]==request.form['certificate']:
+                  #            data=line 
+                   #           break 
+             return render_template('index.html',error=certificateFile,text=content,data=data)
+
+          else:
+             error="This ID doesn't match any certificate, please tape a correct ID"
+             return render_template('index.html',error=error)
+
+
+       except NameError:
+            print("error")
+
+
+
+ 
+if __name__ == '__main__':
+
+    app.run(host='0.0.0.0', port=80)
